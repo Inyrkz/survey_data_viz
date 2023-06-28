@@ -136,8 +136,27 @@ class ChartResource(Resource):
         return jsonify({'charts': charts})
 
 
+# COMPLETE LATER
+class Analysis(Resource):
+    def get(self):
+        df = pd.read_csv(request.files.get("survey_data"))
+        df_meta = pd.read_csv(request.files.get("survey_metadata"))
+        # survey_id = request.form.get("survey_id")
+        # responses len(df)
+        # completeness rate
+        # average response **GET FROM SURVEY METADATA
+        # invalid responses **WHAT IS THIS?
+        # profanities
+        return jsonify({'responses': len(df),
+                        'completeness_rate': "",
+                        'average_responses': "",
+                        'invalid_responses': "",
+                        'profanities': ""})
+
+
 # add ChartResource to the API
 api.add_resource(ChartResource, '/charts')
+api.add_resource(Analysis, '/analysis')
 
 if __name__ == '__main__':
     app.run(debug=True)
