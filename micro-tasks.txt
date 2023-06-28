@@ -1,0 +1,26 @@
+TASKS
+
+1. Multichoice
+- Create a Pie chart object [classes should be less than 5]
+- Create a bar chart object [a possible alternative to the pie chart]
+- Create a grouped bar plot object 
+- Create a grouped histogram object
+
+2. Scaling
+- Create a line chart object
+- Create a radar chart [research how to do this]
+- Create a horizontal bar plot
+
+3. Profiling
+- Create a gender chart [research tool to do this in Python]
+- Create a geography heatmap
+
+4. Open Ended Question
+- Create function to detect language & correct text
+- Create function to extract word [new column should be created in the DataFrame]
+- Create function to extract sentence [new column should be created in the DataFrame]
+- Create function to extract sentiment [new column should be created in the DataFrame]
+- Create function to visualize word cloud
+
+5. Possible experimentation with Dash
+***
