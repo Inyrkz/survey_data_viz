@@ -1,7 +1,9 @@
-# import numpy as np
+import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
+import joblib
+from profanity_check import predict
 from plotly_plot_functions import create_bar_graph, create_violin_plot, create_storage_path
 from plotly_plot_functions import create_box_plot, create_pie_chart, create_histogram
 
@@ -50,14 +52,14 @@ def categorize_survey_questions(df, df_meta):
         i = rows["Questions"]
         j = rows["Tag"]
 
-        if j == "Open-ended":
+        if j == "open_ended":
             open_ended.append(i)
-        elif j == "Scaling":
+        elif j == "scaling":
             categorical.append(i)
-        elif j == "Multichoice":
+        elif j == "multiple_choice":
             categorical.append(i)
         # REMEMBER: TEST THIS PROFILING SECTION LATER WHEN YOU GET MORE SURVEY DATA***
-        elif j == "Profiling":
+        elif j == "profiling":
             # check the survey dataframe to know if the answer has numerical data
             if df[i].dtype == "float64" or df[i].dtype == "int64":
                 numeric.append(i)
@@ -112,6 +114,103 @@ def plot_charts(categorical_variables, numeric_variables, df, storage_path):
                                           storage_path=storage_path))
 
 
+# Section 5: Analysis Functions
+def average_response_time(survey_dataframe):
+    """Function to calculate the average time it took all the responders to fill the survey form
+
+    Parameters
+    ----------
+    survey_dataframe, dataframe
+        This is the survey dataframe. One of the column is 'average_response'
+
+    Return
+    ------
+    average, float
+    """
+    column_name = 'average_response'
+    if column_name not in survey_dataframe.columns:
+        raise ValueError(f"Column '{column_name}' does not exist in the DataFrame.")
+
+    average = survey_dataframe[column_name].mean()
+    return average
+
+
+def calculate_completion_percentage(survey_dataframe):
+    """Function to calculate the completion rate of a survey response
+
+    Parameters
+    ----------
+    survey_dataframe, dataframe
+        This is the survey dataframe.
+
+    Return
+    ------
+    completion_percentage, float
+    """
+    total_cells = survey_dataframe.size
+    missing_cells = survey_dataframe.isnull().sum().sum()
+
+    completion_percentage = 100 - (missing_cells / total_cells * 100)
+    completion_percentage = round(completion_percentage, 2)
+    return completion_percentage
+
+
+def count_invalid_responses(survey_dataframe, invalid_values=['N/A', 'Unknown']):
+    """Function to get the number of invalid responses in a survey.
+    Some examples are ['N/A', 'Unknown']
+
+        Parameters
+        ----------
+        survey_dataframe, dataframe
+            This is the survey dataframe.
+        invalid_values, list
+            This contains the invalid values. The default value is ['N/A', 'Unknown'].
+
+        Return
+        ------
+        invalid_responses, int
+        """
+    invalid_responses = survey_dataframe[survey_dataframe.isin(invalid_values)].count().sum()
+    return invalid_responses
+
+
+def count_profanities(survey_dataframe, text_columns=open_ended):
+    """Function to get the number of invalid responses in a survey.
+    Some examples are ['N/A', 'Unknown']
+
+    Parameters
+    ----------
+    survey_dataframe, dataframe
+        This is the survey dataframe.
+    text_columns, list
+        This contains the list of coumns to check. The default is the open_ended question list
+
+    Return
+    ------
+       count, int
+    """
+    count = 0
+    if len(text_columns) != 0:
+        # Iterate over the specified text columns
+        for column in text_columns:
+            # Iterate over the rows of the DataFrame
+            for _, row in survey_dataframe.iterrows():
+                text = str(row[column])
+                # if text is not a missing value, continue
+                if text != np.nan():
+                    # Use the profanity-check library to predict profanity
+                    profanity_prediction = predict([text])
+
+                    # If profanity is detected, increment the count
+                    if profanity_prediction[0] == 1:
+                        count += 1
+                else:
+                    continue
+
+    return count
+
+
+
 class ChartResource(Resource):
     def post(self):
         # Access the uploaded files
@@ -126,6 +225,13 @@ class ChartResource(Resource):
         # Categorize survey questions
         categorized_questions = categorize_survey_questions(df, df_meta)
 
+        # Perform Quick Analysis
+        profanity_count = count_profanities(survey_dataframe=df,
+                                            text_columns=categorized_questions.get('open_ended'))
+        invalid_response_count = count_invalid_responses(survey_dataframe=df)
+        completion_perc = calculate_completion_percentage(survey_dataframe=df)
+        average_time = average_response_time(survey_dataframe=df)
+
         # Plot charts based on category
         plot_charts(categorized_questions.get('categorical'),
                     categorized_questions.get('numeric'),
@@ -133,30 +239,19 @@ class ChartResource(Resource):
                     storage_path)
 
         # send the image files
-        return jsonify({'charts': charts})
-
-
-# COMPLETE LATER
-class Analysis(Resource):
-    def get(self):
-        df = pd.read_csv(request.files.get("survey_data"))
-        df_meta = pd.read_csv(request.files.get("survey_metadata"))
-        # survey_id = request.form.get("survey_id")
-        # responses len(df)
-        # completeness rate
-        # average response **GET FROM SURVEY METADATA
-        # invalid responses **WHAT IS THIS?
-        # profanities
-        return jsonify({'responses': len(df),
-                        'completeness_rate': "",
-                        'average_responses': "",
-                        'invalid_responses': "",
-                        'profanities': ""})
+        return jsonify({'survey_id': survey_id,
+                        'analysis': {'number of responses': len(df),
+                                     'completeness_rate': completion_perc,
+                                     'average_responses': average_time,
+                                     'invalid_responses': invalid_response_count,
+                                     'profanities': profanity_count},
+                        'charts': charts,
+                        })
 
 
 # add ChartResource to the API
 api.add_resource(ChartResource, '/charts')
-api.add_resource(Analysis, '/analysis')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

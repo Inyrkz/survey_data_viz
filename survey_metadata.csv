@@ -1,9 +1,9 @@
 Questions,Tag
-How well do you rate the session ?,Multichoice
-What was your key learning from the session ?,Open-ended
-Did it meet your expectations?,Multichoice
-"On a scale from 1-6, how likely are you recommend the session to a friend or colleague ?",Scaling
-What are your expectations for future sessions ?,Open-ended
-Any additional comments you would like to share ?,Open-ended
-Age,Profiling
-Gender,Profiling
+How well do you rate the session ?,multiple_choice
+What was your key learning from the session ?,open_ended
+Did it meet your expectations?,multiple_choice
+"On a scale from 1-6, how likely are you recommend the session to a friend or colleague ?",scaling
+What are your expectations for future sessions ?,open_ended
+Any additional comments you would like to share ?,open_ended
+Age,profiling
+Gender,profiling
