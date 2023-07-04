@@ -11,6 +11,7 @@ dash-table==5.0.0
 Flask==2.2.5
 Flask-RESTful==0.3.10
 fonttools==4.40.0
+gunicorn==20.1.0
 importlib-metadata==6.7.0
 importlib-resources==5.12.0
 itsdangerous==2.1.2
