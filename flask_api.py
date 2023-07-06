@@ -23,8 +23,8 @@ class ChartResource(Resource):
         categorized_questions = categorize_survey_questions(df, df_meta)
 
         # Perform Quick Analysis
-        profanity_count = count_profanities(survey_dataframe=df,
-                                            text_columns=categorized_questions.get('open_ended'))
+        # profanity_count = count_profanities(survey_dataframe=df,
+        #                                     text_columns=categorized_questions.get('open_ended'))
         invalid_response_count = count_invalid_responses(survey_dataframe=df)
         completion_perc = calculate_completion_percentage(survey_dataframe=df)
         average_time = average_response_time(survey_dataframe=df)
@@ -41,7 +41,7 @@ class ChartResource(Resource):
                                      'completeness_rate': str(completion_perc),
                                      'average_responses': str(average_time),
                                      'invalid_responses': str(invalid_response_count),
-                                     'profanities': str(profanity_count)},
+                                     'profanities': "Unknown"},
                         'charts': charts,
                         })
 
