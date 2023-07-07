@@ -35,6 +35,10 @@ class ChartResource(Resource):
                     df,
                     storage_path)
 
+        # add the link to where the images are stored in PythonAnywhere. CHANGE LATER TO AWS BUCKET
+        prefix = 'https://www.pythonanywhere.com/user/datawhisperer/files/home/datawhisperer/'
+        chart_link = [prefix + image for image in charts]
+
         # send the image files
         return jsonify({'survey_id': str(survey_id),
                         'analysis_result': {'number of responses': str(len(df)),
@@ -42,7 +46,7 @@ class ChartResource(Resource):
                                             'average_responses': str(average_time),
                                             'invalid_responses': str(invalid_response_count),
                                             'profanities': "Unknown"},
-                        'charts': charts,
+                        'charts': chart_link,
                         'image_format': "PNG"
                         })
 

@@ -102,7 +102,21 @@ def categorize_survey_questions(df, df_meta):
 
 # SECTION 4: Plot Data Based on Category
 def plot_charts(categorical_variables, numeric_variables, df, storage_path):
-    """Function to plot charts based on the category of the survey question"""
+    """Function to plot charts based on the category of the survey question
+
+    Parameters
+    ----------
+    categorical_variables, list
+        This contains all the categorical variable in the survey.
+    numeric_variables, list
+        This contains all the numeric variable in the survey.
+    df, dataframe
+        This is the survey data
+    storage_path, str
+        This is where the directory plotted images will be stored
+
+
+    """
     # Convert the datatype of all the column in the categorical list to the categorical datatype
     for i in categorical_variables:
         df[i] = df[i].astype('category')

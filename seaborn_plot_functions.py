@@ -15,7 +15,7 @@ def create_storage_path(survey_id="sample_001"):
                 The full path to where the plots will be stored
     """
     # create a directory to store the plot images
-    directory_path = 'https://www.pythonanywhere.com/user/datawhisperer/files/home/datawhisperer/survey_images'
+    directory_path = 'survey_images'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     # create a folder for each survey to store the charts associated with that survey
