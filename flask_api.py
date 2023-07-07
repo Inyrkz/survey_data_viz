@@ -37,12 +37,13 @@ class ChartResource(Resource):
 
         # send the image files
         return jsonify({'survey_id': str(survey_id),
-                        'analysis': {'number of responses': str(len(df)),
-                                     'completeness_rate': str(completion_perc),
-                                     'average_responses': str(average_time),
-                                     'invalid_responses': str(invalid_response_count),
-                                     'profanities': "Unknown"},
+                        'analysis_result': {'number of responses': str(len(df)),
+                                            'completeness_rate': str(completion_perc),
+                                            'average_responses': str(average_time),
+                                            'invalid_responses': str(invalid_response_count),
+                                            'profanities': "Unknown"},
                         'charts': charts,
+                        'image_format': "PNG"
                         })
 
 

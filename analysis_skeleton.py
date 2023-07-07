@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import requests
 # from profanity_check import predict
-from plotly_plot_functions import *
+from seaborn_plot_functions import *
 
 # create empty lists for the different categories of survey questions
 categorical = []

@@ -1,8 +1,8 @@
-"""This script contains functions to create different kinds of plot"""
+"""This script contains functions to create different kinds of plot with Plotly"""
 
 # import matplotlib.pyplot as plt
 # import seaborn as sns
-import plotly.graph_objs as go
+# import plotly.graph_objs as go
 import os
 # import plotly.offline as pyo
 # import plotly.io as pio
@@ -123,7 +123,7 @@ def create_box_plot(data, title, storage_path, x_label="Chart", y_label="Value")
 
     # pio.show(fig)
     # Save the chart as an image. Let the image match the title
-    filename = '{}_violin_plot.png'.format(title.replace(" ", "_").replace("?", ""))
+    filename = '{}_boxplot.png'.format(title.replace(" ", "_").replace("?", ""))
     # add the image plot to the survey folder
     full_path = os.path.join(storage_path, filename)
     fig.write_image(full_path)
