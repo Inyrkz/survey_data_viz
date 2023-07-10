@@ -1,8 +1,56 @@
 """This script contains functions to create different kinds of plot with Seaborn"""
-
+import boto3
+from botocore import exceptions as botoException
+from urllib3.exceptions import ConnectTimeoutError
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from io import BytesIO
+
+
+# Save the generated plot to AWS S3 bucket
+s3_bucket_name = "eiraquest-s3-bucket"
+folder_path = "eda-charts"
+
+MY_AWS_ACCESS_KEY_ID="AKIAWLFBGVVYJF27TYLK"
+MY_AWS_SECRET_ACCESS_KEY="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"
+MY_AWS_REGION_NAME="us-east-2"
+
+aws_s3 = boto3.client(
+    "s3",
+    aws_access_key_id=MY_AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=MY_AWS_SECRET_ACCESS_KEY,
+    region_name=MY_AWS_REGION_NAME
+)
+
+s3_base_url = "https://eiraquest-s3-bucket.s3.us-east-2.amazonaws.com/"
+
+
+def save_to_s3(file, file_key):
+    """Convert the matplotlib figure to bytes,
+    upload it to an S3 bucket with the specified key,
+    and returns the URL of the uploaded image."""
+    # convert the file to bytes
+    buffer = BytesIO()
+    extension = "png"
+    file.savefig(buffer, format=extension)
+    # set the stream position to the beginning of the buffer.
+    buffer.seek(0)
+    # upload the file to s3
+    # Construct the object key with the desired folder path
+    object_key = f"{folder_path}/{file_key}.{extension}"
+
+    try:
+        aws_s3.upload_fileobj(buffer, s3_bucket_name, object_key)
+        return s3_base_url + object_key
+    except botoException.ConnectTimeoutError as bctr:
+        print("Boto time out exception" + str(bctr))
+    except ConnectTimeoutError as ctr:
+        print("URL LIB time out exception" + str(ctr))
+    except Exception as e:
+        print("Error uploading to s3" + str(e))
+
+    return None
 
 
 def create_storage_path(survey_id="sample_001"):
@@ -63,8 +111,11 @@ def create_bar_graph(series, title, storage_path, x_label="Values", y_label="Cou
     filename = '{}_bar_chart.png'.format(title.replace(" ", "_").replace("?", ""))
     # add the image plot to the survey folder
     full_path = os.path.join(storage_path, filename)
-    plt.savefig(full_path)
-    return full_path
+    # plt.savefig(full_path)
+    # return full_path
+    # Replace the local file saving with S3 upload
+    url = save_to_s3(plt, full_path)
+    return url
 
 
 def create_violin_plot(data, title, storage_path, x_label=" ", y_label="Value"):
@@ -92,8 +143,12 @@ def create_violin_plot(data, title, storage_path, x_label=" ", y_label="Value"):
     filename = '{}_violin_chart.png'.format(title.replace(" ", "_").replace("?", ""))
     # add the image plot to the survey folder
     full_path = os.path.join(storage_path, filename)
-    plt.savefig(full_path)
-    return full_path
+    # plt.savefig(full_path)
+    # return full_path
+
+    # Replace the local file saving with S3 upload
+    url = save_to_s3(plt, full_path)
+    return url
 
 
 def create_box_plot(data, title, storage_path, x_label=" ", y_label="Value"):
@@ -121,8 +176,12 @@ def create_box_plot(data, title, storage_path, x_label=" ", y_label="Value"):
     filename = '{}_boxplot.png'.format(title.replace(" ", "_").replace("?", ""))
     # add the image plot to the survey folder
     full_path = os.path.join(storage_path, filename)
-    plt.savefig(full_path)
-    return full_path
+    # plt.savefig(full_path)
+    # return full_path
+
+    # Replace the local file saving with S3 upload
+    url = save_to_s3(plt, full_path)
+    return url
 
 
 def create_pie_chart(series, title, storage_path):
@@ -150,8 +209,12 @@ def create_pie_chart(series, title, storage_path):
     filename = '{}_pie_chart.png'.format(title.replace(" ", "_").replace("?", ""))
     # add the image plot to the survey folder
     full_path = os.path.join(storage_path, filename)
-    plt.savefig(full_path)
-    return full_path
+    # plt.savefig(full_path)
+    # return full_path
+
+    # Replace the local file saving with S3 upload
+    url = save_to_s3(plt, full_path)
+    return url
 
 
 def create_histogram(data, title, storage_path, x_label="Values", y_label="Frequency", bins="auto"):
@@ -180,5 +243,8 @@ def create_histogram(data, title, storage_path, x_label="Values", y_label="Frequ
     # Save the chart as an image. Let the image match the title
     filename = '{}_histogram.png'.format(title.replace(" ", "_").replace("?", ""))
     full_path = os.path.join(storage_path, filename)
-    plt.savefig(full_path)
-    return full_path
+    # plt.savefig(full_path)
+    # return full_path
+    # Replace the local file saving with S3 upload
+    url = save_to_s3(plt, full_path)
+    return url

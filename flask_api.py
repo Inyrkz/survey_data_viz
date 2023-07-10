@@ -12,9 +12,9 @@ class ChartResource(Resource):
     def post(self):
         # Access the uploaded files
         # survey_data, survey_metadata and survey_id are the key names from the client
-        df = pd.read_csv(request.files.get("survey_data"))
-        df_meta = pd.read_csv(request.files.get("survey_metadata"))
-        survey_id = request.form.get("survey_id")
+        df = pd.read_csv(request.files.get("quest_data"))
+        df_meta = pd.read_csv(request.files.get("quest_metadata"))
+        survey_id = request.form.get("quest_id")
 
         # Generate storage path based on survey id
         storage_path = create_storage_path(str(survey_id))
@@ -36,8 +36,8 @@ class ChartResource(Resource):
                     storage_path)
 
         # add the link to where the images are stored in PythonAnywhere. CHANGE LATER TO AWS BUCKET
-        prefix = 'https://www.pythonanywhere.com/user/datawhisperer/files/home/datawhisperer/'
-        chart_link = [prefix + image for image in charts]
+        # prefix = 'https://www.pythonanywhere.com/user/datawhisperer/files/home/datawhisperer/'
+        # chart_link = [prefix + image for image in charts]
 
         # send the image files
         return jsonify({'survey_id': str(survey_id),
@@ -46,9 +46,29 @@ class ChartResource(Resource):
                                             'average_responses': str(average_time),
                                             'invalid_responses': str(invalid_response_count),
                                             'profanities': "Unknown"},
-                        'charts': chart_link,
+                        'charts': charts,
                         'image_format': "PNG"
                         })
+
+# {
+#
+#     "survey_id": "123g-5ythg-ggg",
+#     "summary" : {
+#         "number_of_responses": 347,
+#         "number_of_invalid_responses": 8,
+#         "average_ttr" : "9 seconds",
+#         "completion_rate": 80
+#     },
+#     "items" : [
+#         {
+#             "survey_item_id" : 2,
+#             "question": "this is a question",
+#             "number_of_valid_input": 55,
+#             "visualization": "ffhfjf",
+#             "visualization_format": "image|html"
+#         }
+#     ]
+# }
 
 
 # add ChartResource to the API
