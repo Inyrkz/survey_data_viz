@@ -9,12 +9,7 @@ from io import BytesIO
 
 
 # Save the generated plot to AWS S3 bucket
-s3_bucket_name = "eiraquest-s3-bucket"
-folder_path = "eda-charts"
 
-MY_AWS_ACCESS_KEY_ID="AKIAWLFBGVVYJF27TYLK"
-MY_AWS_SECRET_ACCESS_KEY="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"
-MY_AWS_REGION_NAME="us-east-2"
 
 aws_s3 = boto3.client(
     "s3",
