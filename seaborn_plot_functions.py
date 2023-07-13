@@ -18,7 +18,7 @@ aws_s3 = boto3.client(
     region_name=MY_AWS_REGION_NAME
 )
 
-s3_base_url = "https://eiraquest-s3-bucket.s3.us-east-2.amazonaws.com/"
+s3_base_url = ""
 
 
 def save_to_s3(file, file_key):
