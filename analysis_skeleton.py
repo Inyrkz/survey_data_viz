@@ -403,7 +403,44 @@ def compute_charts_data(categorical_variables, sentiment_columns,
     return charts
 
 
-# Section 5: Analysis Functions
+# Section 5: GeoJSON Data
+def create_geojson(response_metadata, id_field, latitude_field, longitude_field):
+    """
+    Create a GeoJSON FeatureCollection from a DataFrame containing latitude, longitude, and an identifier field.
+
+    Parameters:
+        response_metadata (pd.DataFrame): The DataFrame containing the data.
+        id_field (str): The name of the identifier field (e.g., response_id).
+        latitude_field (str): The name of the latitude field.
+        longitude_field (str): The name of the longitude field.
+
+    Returns:
+        str: A GeoJSON FeatureCollection as a JSON string.
+    """
+    # Create a list of GeoJSON features
+    features = []
+    for index, row in response_metadata.iterrows():
+        feature = {
+            "type": "Feature",
+            "properties": {
+                id_field: row[id_field]
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [row[longitude_field], row[latitude_field]]
+            }
+        }
+        features.append(feature)
+
+    # Create a GeoJSON FeatureCollection
+    geojson_data = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    return geojson_data
+
+
+# Section 6: Analysis Functions
 def average_response_time(response_metadata):
     """Function to calculate the average time it took all the responders to fill the survey form
 

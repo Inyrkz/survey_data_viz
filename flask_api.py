@@ -36,7 +36,7 @@ class ChartResource(Resource):
         df, sentiment_columns = perform_sentiment_analysis(df=df,
                                                            columns_to_analyze=categorized_questions.get('open_ended'))
 
-        # Plot charts based on category
+        # Generate charts data based on category
         charts = compute_charts_data(categorized_questions.get('categorical'),
                                      sentiment_columns,
                                      categorized_questions.get('numeric'),
@@ -46,6 +46,9 @@ class ChartResource(Resource):
                                      response_meta
                                     )
 
+        # Generate GeoJSON data
+        result_geojson = create_geojson(response_meta, "response_id", "latitude", "longitude")
+
         # send the image files
         return jsonify({'quest_id': str(quest_id),
                         'analysis_result': {'number of responses': str(len(df)),
@@ -54,7 +57,8 @@ class ChartResource(Resource):
                                             'average_responses': "",
                                             'invalid_responses': str(invalid_response_count),
                                             'profanities': "Unknown"},
-                        'charts': charts})
+                        'charts': charts,
+                        'geojson': result_geojson})
 
 
 # add ChartResource to the API

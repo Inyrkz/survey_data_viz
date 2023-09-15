@@ -22,13 +22,14 @@ def compute_bar_graph_data(series, title, survey_item_id):
     """
     value_counts = series.value_counts()
     data = {
+        'plot_type': 'bar_graph', 
+        'alternative_chart': 'horizontal_bar_graph',
+        'title': title,
         'x_values': value_counts.index.tolist(),
         'y_values': value_counts.values.tolist(),
         'x_label': 'Values',
-        'y_label': 'Count',
-        'title': title,
-        'survey_item_id':survey_item_id,
-        'plot_type': ['bar_graph', 'horizontal_bar_graph']
+        'y_label': 'Count',        
+        'survey_item_id':survey_item_id        
     }
     return data
 
@@ -49,11 +50,12 @@ def compute_pie_chart_data(series, title, survey_item_id):
     labels = value_counts.index.tolist()
     sizes = value_counts.values.tolist()
     data = {
+        'plot_type': 'pie_chart', 
+        'alternative_chart': 'donut_chart',
         'labels': labels,
         'sizes': sizes,
         'title': title,
-        'survey_item_id': survey_item_id,
-        'plot_type': ['pie_chart', 'donut_chart']
+        'survey_item_id': survey_item_id        
     }
     return data
 
@@ -71,13 +73,12 @@ def compute_violin_plot_data(data, title, survey_item_id):
         id associated with the quest survey question
     """
     data = {
-        'values': data.tolist(),
-        'x_label': '',
-        'y_label': 'Value',
+        'plot_type': 'violin_plot',
         'title': title,
-        'survey_item_id': survey_item_id,
-        'plot_type': ['violin_plot']
-    }
+        'values': data.tolist(),
+        'y_label': 'Value',        
+        'survey_item_id': survey_item_id   
+            }
     return data
 
 
@@ -94,11 +95,11 @@ def compute_box_plot_data(data, title, survey_item_id):
         id associated with the quest survey question
     """
     data = {
-        'values': data.tolist(),
-        'x_label': '',
-        'y_label': 'Value',
+        'plot_type': 'boxplot',
         'title': title,
-        'plot_type': ['boxplot']
+        'values': data.tolist(),
+        'y_label': 'Value',        
+        'survey_item_id': survey_item_id        
     }
     return data
 
@@ -116,12 +117,13 @@ def compute_histogram_data(data, title, survey_item_id):
         id associated with the quest survey question
     """
     data = {
+        'plot_type': 'histogram',
+        'alternative_charts': ['density_plot',],
+        'title': title,
         'values': data.tolist(),
         'x_label': 'Values',
-        'y_label': 'Frequency',
-        'title': title,
-        'survey_item_id': survey_item_id,
-        'plot_type': ['histogram']
+        'y_label': 'Frequency',        
+        'survey_item_id': survey_item_id
     }
     return data
 
@@ -142,10 +144,10 @@ def compute_wordcloud_data(data, title, survey_item_id):
     # replace nan with empty string
     text = text.replace('nan', '')
     data = {
-        'text': text,
+        'plot_type': 'wordcloud',
         'title': title,
-        'survey_item_id': survey_item_id,
-        'plot_type': ['wordcloud']
+        'text': text,        
+        'survey_item_id': survey_item_id        
     }
     return data
 
@@ -175,6 +177,10 @@ def get_daily_response_count_data(df):
 
     # Create a dictionary with data points
     data = {
+        'plot_type': 'line_chart',
+        'title': 'Daily Response Counts Over Time',
+        'x_label': 'Date',
+        'y_label': 'Response Counts',
         'dates': daily_counts['date'].tolist(),
         'counts': daily_counts[0].tolist(),
     }
@@ -201,6 +207,7 @@ def analyze_city(dataframe):
     # Convert to JSON in the desired format
     city_json = {
         'plot_type': 'horizontal_bar_chart',
+        'alternative_chart': 'bar_graph',
         'x_label': 'City',
         'y_label': 'Count',
         'title': 'Distribution of Survey Respondents by City.',
@@ -230,11 +237,12 @@ def analyze_country(dataframe):
     # Convert to JSON in the desired format
     country_json = {
         'plot_type': 'horizontal_bar_chart',
-        'x_label': 'Country',
-        'y_label': 'Count',
+        'alternative_chart': 'bar_graph',
         'title': 'Distribution of Survey Respondents by Country.',
         'country': country_data['country'].tolist(),
-        'user_count': country_data['user_count'].tolist()
+        'user_count': country_data['user_count'].tolist(),
+        'x_label': 'Country',
+        'y_label': 'Count'
     }
     return country_json
 
@@ -259,11 +267,11 @@ def analyze_region(dataframe):
     # Convert to JSON in the desired format
     region_json = {
         'plot_type': 'horizontal_bar_chart',
-        'x_label': 'Region',
-        'y_label': 'Count',
+        'alternative_chart': 'bar_graph',
         'title': 'Distribution of Survey Respondents by Region.',
         'region': region_data['region'].tolist(),
-        'user_count': region_data['user_count'].tolist()
+        'user_count': region_data['user_count'].tolist(),
+        'x_label': 'Region',
+        'y_label': 'Count'
     }
     return region_json
-
