@@ -161,9 +161,9 @@ def get_daily_response_count_data(df):
     Returns:
     - data: A dictionary containing 'dates' and 'counts' lists.
     """
-    # Reset the index and make 'created_at' an actual column
+     # Reset the index and make 'created_at' an actual column
     df.reset_index(inplace=True)
-
+    
     # Ensure that 'created_at' is in datetime format
     df['created_at'] = pd.to_datetime(df['created_at'])
 
@@ -175,14 +175,9 @@ def get_daily_response_count_data(df):
 
     # Create a dictionary with data points
     data = {
-        'plot_type': 'line_chart',
         'dates': daily_counts['date'].tolist(),
         'counts': daily_counts[0].tolist(),
-        'title': 'Daily Response Count',
-        'xlabel': 'Date',
-        'ylabel': 'Response Count'
     }
-
     return data
  
 

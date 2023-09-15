@@ -31,19 +31,22 @@ def parse_quest_data(df, df_meta):
     # Merge the two DataFrames based on the survey_item_id
     merged_df = df.merge(df_meta, left_on='survey_item_id', right_on='id')
 
-    # create a metadata dataframe as one of the output
+    # Extract a metadata dataframe as one of the output
     metadata_df = merged_df[['question', 'type', 'survey_item_id']]
     # drop duplicates in the metadata_df, if any.
     metadata_df = metadata_df.drop_duplicates()
         
-    # get the response metadata
+    # Extract a response metadata
     response_metadata = merged_df[['response_id', 'quest_completion_time', 'city',
                                    'country', 'region', 'latitude', 'longitude']]
     # drop duplicates in the response_metadata, if any.
     response_metadata = response_metadata.drop_duplicates()
         
     # Keep only a subset of the data. The question and the response
+    # created_at shows the individual responses based on the time survey was taken
     merged_df = merged_df[['question', 'response', 'created_at']]
+    merged_df.drop_duplicates(inplace=True)
+    
     # Use pivot to restructure the data
     # Use 'created at' to get the individual response to all the questions
     restructured_df = merged_df.pivot(index='created_at', columns='question')
@@ -335,7 +338,7 @@ def compute_charts_data(categorical_variables, sentiment_columns,
     charts = []
 
     # compute line chart for daily response
-    charts.append(get_daily_response_count_data(response_metadata))
+    charts.append(get_daily_response_count_data(df))
 
     # compute chart for distribution of respondent by city
     charts.append(analyze_city(response_metadata))
