@@ -1,4 +1,3 @@
-import pandas as pd
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from analysis_skeleton import *
@@ -11,14 +10,15 @@ api = Api(app)
 class ChartResource(Resource):
     def post(self):
         # Access the uploaded files
-        # survey_data, survey_metadata and survey_id are the key names from the client
-        df = pd.read_csv(request.files.get("quest_data"))
-        df_meta = pd.read_csv(request.files.get("quest_metadata"))
-        survey_id = request.form.get("quest_id")
+        # quest_data, quest_metadata and survey_id are the key names from the client
+        quest_data = pd.read_csv(request.files.get("quest_data"))
+        quest_metadata = pd.read_csv(request.files.get("quest_metadata"))
+        quest_id = request.form.get("quest_id")
 
+        # read quest survey data and metadata
+        df, df_meta, response_meta = parse_quest_data(quest_data, quest_metadata)
         # Generate storage path based on survey id
-        storage_path = create_storage_path(str(survey_id))
-
+        storage_path = create_storage_path(str(quest_id))
         # Categorize survey questions
         categorized_questions = categorize_survey_questions(df, df_meta)
 
@@ -26,49 +26,35 @@ class ChartResource(Resource):
         # profanity_count = count_profanities(survey_dataframe=df,
         #                                     text_columns=categorized_questions.get('open_ended'))
         invalid_response_count = count_invalid_responses(survey_dataframe=df)
-        completion_perc = calculate_completion_percentage(survey_dataframe=df)
-        average_time = average_response_time(survey_dataframe=df)
+        completion_rate = calculate_completion_percentage(survey_dataframe=df)
+        average_quest_completion_time = average_response_time(response_metadata=response_meta)
+
+        # correct texts in open_ended questions
+        df = correct_text(df=df,
+                          columns_to_correct=categorized_questions.get('open_ended'))
+        # perform sentiment analysis
+        df, sentiment_columns = perform_sentiment_analysis(df=df,
+                                                           columns_to_analyze=categorized_questions.get('open_ended'))
 
         # Plot charts based on category
-        plot_charts(categorized_questions.get('categorical'),
-                    categorized_questions.get('numeric'),
-                    df,
-                    storage_path)
-
-        # add the link to where the images are stored in PythonAnywhere. CHANGE LATER TO AWS BUCKET
-        # prefix = 'https://www.pythonanywhere.com/user/datawhisperer/files/home/datawhisperer/'
-        # chart_link = [prefix + image for image in charts]
+        charts = compute_charts_data(categorized_questions.get('categorical'),
+                                     sentiment_columns,
+                                     categorized_questions.get('numeric'),
+                                     categorized_questions.get('open_ended'),
+                                     df,
+                                     df_meta,
+                                     response_meta
+                                    )
 
         # send the image files
-        return jsonify({'survey_id': str(survey_id),
+        return jsonify({'quest_id': str(quest_id),
                         'analysis_result': {'number of responses': str(len(df)),
-                                            'completeness_rate': str(completion_perc),
-                                            'average_responses': str(average_time),
+                                            'average_quest_completion_time': str(average_quest_completion_time),
+                                            'completeness_rate': str(completion_rate),
+                                            'average_responses': "",
                                             'invalid_responses': str(invalid_response_count),
                                             'profanities': "Unknown"},
-                        'charts': charts,
-                        'image_format': "PNG"
-                        })
-
-# {
-#
-#     "survey_id": "123g-5ythg-ggg",
-#     "summary" : {
-#         "number_of_responses": 347,
-#         "number_of_invalid_responses": 8,
-#         "average_ttr" : "9 seconds",
-#         "completion_rate": 80
-#     },
-#     "items" : [
-#         {
-#             "survey_item_id" : 2,
-#             "question": "this is a question",
-#             "number_of_valid_input": 55,
-#             "visualization": "ffhfjf",
-#             "visualization_format": "image|html"
-#         }
-#     ]
-# }
+                        'charts': charts})
 
 
 # add ChartResource to the API
